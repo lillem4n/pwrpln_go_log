@@ -32,12 +32,12 @@ type Fmt func(FmtOpts) string
 type Std func(string)
 
 type Log struct {
-	Context      []Metadata
-	MinLogLvl    LogLvl
-	Fmt          Fmt
-	Stderr       Std
-	Stdout       Std
-	TimeLocation *time.Location
+	Context      []Metadata     // Will be prepended to metadata on all log entries
+	MinLogLvl    LogLvl         // Minimal log level to output
+	Fmt          Fmt            // Log message formatter
+	Stderr       Std            // Log message outputter for Debug, Verbose and Info
+	Stdout       Std            // Log message outputter for Warning and Error
+	TimeLocation *time.Location // Timestamp location/time zone setting
 }
 
 func LogName(logLvl LogLvl) string {
