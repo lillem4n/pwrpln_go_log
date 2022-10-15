@@ -38,7 +38,7 @@ log.Debug("A lot of detailed logs to debug your application");
 Using metadata for structured logging:
 
 ```go
-log.InfoM("My log msg", []go_log.Metadata{{Name: "foo", Value: "bar"}})
+log.Info("My log msg", "foo", "bar")
 // 2022-10-11 07:13:49 [Inf] My log msg foo: bar
 ```
 
@@ -47,12 +47,12 @@ Setting a logging context to prepend metadata on all log entries:
 ```go
 log := go_log.Log{}
 log.SetDefaultValues{}
-log.Context = []go_log.Metadata{{Name: "some", Value: "thing"}}
+log.Context = []interface{{"some", "thing"}}
 
 log.Info("A message")
 // 2022-10-11 07:13:49 [Inf] A message some: thing
 
-log.InfoM("Zep", []go_log.Metadata{{Name: "other", Value: "stuff"}})
+log.Info("Zep", "other", "stuff")
 // 2022-10-11 07:13:49 [Inf] A message some: thing other: stuff
 ```
 
@@ -61,7 +61,7 @@ All available options, and their defaults:
 ```go
 loc, _ := time.LoadLocation("UTC")
 log := go_log.Log{
-	Context:      []go_log.Metadata{},  // Will be prepended to metadata on all log entries
+	Context:      []interface{},        // Will be prepended to metadata on all log entries
 	MinLogLvl:    go_log.Info,          // Minimal log level to output
 	Fmt:          go_log.DefaultFmt,    // Log message formatter
 	Stderr:       go_log.DefaultStderr, // Log message outputter for Debug, Verbose and Info

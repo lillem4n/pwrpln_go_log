@@ -1,6 +1,7 @@
 package go_log
 
 import (
+	"fmt"
 	"os"
 	"time"
 )
@@ -15,16 +16,10 @@ const (
 	Debug   LogLvl = 5
 )
 
-type Metadata struct {
-	Name  string
-	Value string
-}
-
 type FmtOpts struct {
-	Context    []Metadata
+	Context    []interface{}
 	LogLvlName string
-	Metadata   []Metadata
-	Msg        string
+	Parts      []interface{}
 	Timestamp  time.Time
 }
 type Fmt func(FmtOpts) string
@@ -32,7 +27,7 @@ type Fmt func(FmtOpts) string
 type Std func(string)
 
 type Log struct {
-	Context      []Metadata     // Will be prepended to metadata on all log entries
+	Context      []interface{}  // Will be prepended to metadata on all log entries
 	MinLogLvl    LogLvl         // Minimal log level to output
 	Fmt          Fmt            // Log message formatter
 	Stderr       Std            // Log message outputter for Debug, Verbose and Info
@@ -80,10 +75,13 @@ func LogNameShort(logLvl LogLvl) string {
 
 func DefaultFmt(opts FmtOpts) string {
 	output := opts.Timestamp.Format("2006-01-02 15:04:05")
-	output += " [" + opts.LogLvlName + "] " + opts.Msg
+	output += " [" + opts.LogLvlName + "] " + fmt.Sprintf("%v", opts.Parts[0])
 
-	for i := 0; i < len(opts.Metadata); i++ {
-		output += " " + opts.Metadata[i].Name + ": " + opts.Metadata[i].Value
+	for i := 0; i < len(opts.Context); i = i + 2 {
+		output += " " + fmt.Sprintf("%v", opts.Context[i]) + ": " + fmt.Sprintf("%v", opts.Context[i+1])
+	}
+	for i := 1; i < len(opts.Parts); i = i + 2 {
+		output += " " + fmt.Sprintf("%v", opts.Parts[i]) + ": " + fmt.Sprintf("%v", opts.Parts[i+1])
 	}
 
 	return output + "\n"
@@ -107,107 +105,57 @@ func (log *Log) SetDefaultValues() {
 	log.TimeLocation, _ = time.LoadLocation("UTC")
 }
 
-func (log *Log) Error(msg string) {
+func (log *Log) Error(parts ...interface{}) {
 	if log.MinLogLvl >= Error {
 		log.Stderr(log.Fmt(FmtOpts{
-			Timestamp:  time.Now().In(log.TimeLocation),
+			Context:    log.Context,
 			LogLvlName: LogNameShort(Error),
-			Msg:        msg,
-			Metadata:   log.Context,
-		}))
-	}
-}
-func (log *Log) ErrorM(msg string, metadata []Metadata) {
-	if log.MinLogLvl >= Error {
-		log.Stderr(log.Fmt(FmtOpts{
+			Parts:      parts,
 			Timestamp:  time.Now().In(log.TimeLocation),
-			LogLvlName: LogNameShort(Error),
-			Msg:        msg,
-			Metadata:   append(log.Context, metadata[:]...),
 		}))
 	}
 }
 
-func (log *Log) Warn(msg string) {
+func (log *Log) Warn(parts ...interface{}) {
 	if log.MinLogLvl >= Warn {
 		log.Stderr(log.Fmt(FmtOpts{
+			Context:    log.Context,
 			Timestamp:  time.Now().In(log.TimeLocation),
 			LogLvlName: LogNameShort(Warn),
-			Msg:        msg,
-			Metadata:   log.Context,
-		}))
-	}
-}
-func (log *Log) WarnM(msg string, metadata []Metadata) {
-	if log.MinLogLvl >= Warn {
-		log.Stderr(log.Fmt(FmtOpts{
-			Timestamp:  time.Now().In(log.TimeLocation),
-			LogLvlName: LogNameShort(Warn),
-			Msg:        msg,
-			Metadata:   append(log.Context, metadata[:]...),
+			Parts:      parts,
 		}))
 	}
 }
 
-func (log *Log) Info(msg string) {
+func (log *Log) Info(parts ...interface{}) {
 	if log.MinLogLvl >= Info {
 		log.Stdout(log.Fmt(FmtOpts{
+			Context:    log.Context,
 			Timestamp:  time.Now().In(log.TimeLocation),
 			LogLvlName: LogNameShort(Info),
-			Msg:        msg,
-			Metadata:   log.Context,
-		}))
-	}
-}
-func (log *Log) InfoM(msg string, metadata []Metadata) {
-	if log.MinLogLvl >= Info {
-		log.Stdout(log.Fmt(FmtOpts{
-			Timestamp:  time.Now().In(log.TimeLocation),
-			LogLvlName: LogNameShort(Info),
-			Msg:        msg,
-			Metadata:   append(log.Context, metadata[:]...),
+			Parts:      parts,
 		}))
 	}
 }
 
-func (log *Log) Verbose(msg string) {
+func (log *Log) Verbose(parts ...interface{}) {
 	if log.MinLogLvl >= Verbose {
 		log.Stdout(log.Fmt(FmtOpts{
+			Context:    log.Context,
 			Timestamp:  time.Now().In(log.TimeLocation),
 			LogLvlName: LogNameShort(Verbose),
-			Msg:        msg,
-			Metadata:   log.Context,
-		}))
-	}
-}
-func (log *Log) VerboseM(msg string, metadata []Metadata) {
-	if log.MinLogLvl >= Verbose {
-		log.Stdout(log.Fmt(FmtOpts{
-			Timestamp:  time.Now().In(log.TimeLocation),
-			LogLvlName: LogNameShort(Verbose),
-			Msg:        msg,
-			Metadata:   append(log.Context, metadata[:]...),
+			Parts:      parts,
 		}))
 	}
 }
 
-func (log *Log) Debug(msg string) {
+func (log *Log) Debug(parts ...interface{}) {
 	if log.MinLogLvl >= Debug {
 		log.Stdout(log.Fmt(FmtOpts{
+			Context:    log.Context,
 			Timestamp:  time.Now().In(log.TimeLocation),
 			LogLvlName: LogNameShort(Debug),
-			Msg:        msg,
-			Metadata:   log.Context,
-		}))
-	}
-}
-func (log *Log) DebugM(msg string, metadata []Metadata) {
-	if log.MinLogLvl >= Debug {
-		log.Stdout(log.Fmt(FmtOpts{
-			Timestamp:  time.Now().In(log.TimeLocation),
-			LogLvlName: LogNameShort(Debug),
-			Msg:        msg,
-			Metadata:   append(log.Context, metadata[:]...),
+			Parts:      parts,
 		}))
 	}
 }

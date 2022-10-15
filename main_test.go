@@ -38,22 +38,16 @@ func TestError(t *testing.T) {
 	assert.Equal(t, "[\x1b[31mErr\x1b[0m] lureri\n", stderr[20:])
 }
 
-// func TestMetadata(t *testing.T) {
-// 	testLog := Log{}
-// 	testLog.SetDefaultValues()
-// 	testLog.Context = []Metadata{
-// 		{
-// 			Name:  "foo",
-// 			Value: "bar",
-// 		},
-// 		{
-// 			Name:  "lur",
-// 			Value: "pelle",
-// 		},
-// 	}
-// 	testLog.Info("bosse")
-// 	testLog.ErrorM("frasse", []Metadata{{Name: "wat", Value: ":O"}})
-// }
+func TestMetadata(t *testing.T) {
+	testLog := Log{}
+	testLog.SetDefaultValues()
+	testLog.Context = []interface{}{
+		"foo", "bar",
+		"lur", "pelle",
+	}
+	testLog.Info("bosse")
+	testLog.Error("frasse", "wat", ":O")
+}
 
 // func TestWoo(t *testing.T) {
 // 	loc, _ := time.LoadLocation("UTC")
