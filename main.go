@@ -35,6 +35,22 @@ type Log struct {
 	TimeLocation *time.Location // Timestamp location/time zone setting
 }
 
+func LogLvlFromStr(logLvl string) LogLvl {
+	if logLvl == "Error" {
+		return Error
+	} else if logLvl == "Warn" {
+		return Warn
+	} else if logLvl == "Info" {
+		return Info
+	} else if logLvl == "Verbose" {
+		return Verbose
+	} else if logLvl == "Debug" {
+		return Debug
+	} else {
+		return 0
+	}
+}
+
 func LogName(logLvl LogLvl) string {
 	if logLvl == 0 {
 		return "Error"
@@ -95,14 +111,16 @@ func DefaultStdout(msg string) {
 	os.Stdout.WriteString(msg)
 }
 
-func (log *Log) SetDefaultValues() {
-	if log.MinLogLvl == 0 {
-		log.MinLogLvl = 3
+func GetLog() Log {
+	log := Log{
+		Fmt:       DefaultFmt,
+		MinLogLvl: Info,
+		Stderr:    DefaultStderr,
+		Stdout:    DefaultStdout,
 	}
-	log.Fmt = DefaultFmt
-	log.Stderr = DefaultStderr
-	log.Stdout = DefaultStdout
 	log.TimeLocation, _ = time.LoadLocation("UTC")
+
+	return log
 }
 
 func (log *Log) Error(parts ...interface{}) {

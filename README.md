@@ -12,8 +12,7 @@ Most basic usage with default settings:
 import "gitea.larvit.se/pwrpln/go_log"
 
 func main() {
-	log := go_log.Log{}
-	log.SetDefaultValues{}
+	log := go_log.GetLog()
 	log.Error("Apocalypse! :O"); // stderr
 	log.Warn("The chaos is near"); // stderr
 	log.Info("All is well, but this message is important"); // stdout
@@ -27,8 +26,8 @@ func main() {
 Set log level:
 
 ```go
-log := go_log.Log{MinLogLvl: go_log.Debug}
-log.SetDefaultValues{}
+log := go_log.GetLog()
+log.MinLogLvl = go_log.Debug
 
 // Will now show on stdout
 log.Debug("A lot of detailed logs to debug your application");
@@ -45,8 +44,7 @@ log.Info("My log msg", "foo", "bar")
 Setting a logging context to prepend metadata on all log entries:
 
 ```go
-log := go_log.Log{}
-log.SetDefaultValues{}
+log := go_log.GetLog()
 log.Context = []interface{{"some", "thing"}}
 
 log.Info("A message")
@@ -68,5 +66,4 @@ log := go_log.Log{
 	Stdout:       go_log.DefaultStdout, // Log message outputter for Warning and Error
 	TimeLocation: loc,                  // Timestamp location/time zone setting
 }
-// Don't run log.SetDefaultValues{} since it will override your settings
 ```

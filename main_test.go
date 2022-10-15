@@ -9,8 +9,7 @@ import (
 func TestDefault(t *testing.T) {
 	stdout := ""
 	stderr := ""
-	testLog := Log{}
-	testLog.SetDefaultValues()
+	testLog := GetLog()
 	testLog.Stdout = func(msg string) {
 		stdout += msg
 	}
@@ -29,8 +28,7 @@ func TestDefault(t *testing.T) {
 
 func TestError(t *testing.T) {
 	stderr := ""
-	testLog := Log{}
-	testLog.SetDefaultValues()
+	testLog := GetLog()
 	testLog.Stderr = func(msg string) {
 		stderr += msg
 	}
@@ -38,16 +36,15 @@ func TestError(t *testing.T) {
 	assert.Equal(t, "[\x1b[31mErr\x1b[0m] lureri\n", stderr[20:])
 }
 
-func TestMetadata(t *testing.T) {
-	testLog := Log{}
-	testLog.SetDefaultValues()
-	testLog.Context = []interface{}{
-		"foo", "bar",
-		"lur", "pelle",
-	}
-	testLog.Info("bosse")
-	testLog.Error("frasse", "wat", ":O")
-}
+// func TestMetadata(t *testing.T) {
+// 	testLog := GetLog()
+// 	testLog.Context = []interface{}{
+// 		"foo", "bar",
+// 		"lur", "pelle",
+// 	}
+// 	testLog.Info("bosse")
+// 	testLog.Error("frasse", "wat", ":O")
+// }
 
 // func TestWoo(t *testing.T) {
 // 	loc, _ := time.LoadLocation("UTC")
