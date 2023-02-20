@@ -59,7 +59,7 @@ All available options, and their defaults:
 ```go
 loc, _ := time.LoadLocation("UTC") // See more info at https://pkg.go.dev/time#LoadLocation
 log := go_log.Log{
-	Context:      []interface{},                // Will be prepended to metadata on all log entries
+	Context:      []interface{}{},                // Will be prepended to metadata on all log entries
 	MinLogLvl:    go_log.LogLvlFromStr("Info"), // Minimal log level to output
 	Fmt:          go_log.DefaultFmt,            // Log message formatter
 	Stderr:       go_log.DefaultStderr,         // Log message outputter for Debug, Verbose and Info
@@ -73,4 +73,5 @@ Or change them after initialization like this:
 ```go
 log := go_log.GetLog()
 log.MinLogLvl = go_log.LogLvlFromStr("Debug")
+log.Context = []interface{}{"key1", "value1", "key2", "value2"}
 ```
